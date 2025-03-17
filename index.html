@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 h-screen">
+    <div class="container mx-auto p-4 h-full">
+        <div class="flex flex-col bg-white rounded-lg shadow-lg h-full">
+            <!-- Header -->
+            <div class="bg-indigo-600 text-white p-4 rounded-t-lg">
+                <h1 class="text-xl font-bold">Chat App</h1>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="flex-1 p-4 overflow-y-auto">
+                <div class="space-y-4 " id="chat-area">
+                    <!-- Sample message (left) -->
+
+
+                    <!-- Sample message (right) -->
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="border-t p-4">
+            <form id="chat_form" class="flex space-x-2">
+                <input id="chat_input" type="text"
+                    class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Type your message...">
+                <button type="submit"
+                    class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+    </div>
+    <script>
+        const form_input = document.querySelector("#chat_form");
+        const input = document.querySelector("#chat_input");
+        const socket = new WebSocket('ws://localhost:8001');
+        const zone=document.querySelector("#chat-area");
+        socket.addEventListener('open', function () {
+            console.log("connected");
+
+        });
+
+
+        socket.addEventListener('message', function (event) {
+            zone.innerHTML+=LeftChat(event.data);
+        });
+
+
+        socket.addEventListener('error', function (error) {
+            console.log(error);
+        });
+
+        socket.addEventListener('close', function () {
+            console.log('disconnected');
+        });
+
+        form_input.addEventListener("submit", function (e) {
+            e.preventDefault();
+            socket.send(input.value);
+            zone.innerHTML+=RightChat(input.value);
+            input.value = '';
+        });
+
+        function LeftChat(msg) {
+            return `
+ <div class="flex items-start">
+                        <div class="bg-gray-100 rounded-lg p-3 max-w-[70%]">
+                            <p class="text-gray-800">${msg}</p>
+                          
+                        </div>
+                    </div>`;
+        }
+
+        function RightChat(msg) {
+            return `
+
+
+<div class="flex items-start justify-end">
+                        <div class="bg-indigo-500 text-white rounded-lg p-3 max-w-[70%]">
+                            <p>${msg}</p>
+                           
+                        </div>
+
+`;
+        }
+
+    </script>
+</body>
+
+</html>
